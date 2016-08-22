@@ -14,7 +14,7 @@ type Token struct {
 	CreateTime  time.Time `json:"-"`
 }
 
-// NewTokenHandle 创建令牌验证实例
+// NewTokenHandle 创建令牌验证
 func NewTokenHandle(cfg *Config) *TokenHandle {
 	return &TokenHandle{
 		cfg: cfg,

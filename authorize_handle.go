@@ -4,6 +4,14 @@ import (
 	"github.com/astaxie/beego/httplib"
 )
 
+// NewAuthorizeHandle 创建授权处理
+func NewAuthorizeHandle(cfg *Config) *AuthorizeHandle {
+	return &AuthorizeHandle{
+		cfg: cfg,
+		th:  NewTokenHandle(cfg),
+	}
+}
+
 // AuthorizeHandle 授权处理
 type AuthorizeHandle struct {
 	cfg *Config
@@ -36,11 +44,19 @@ func (ah *AuthorizeHandle) request(router string, body, v interface{}) (result *
 		return
 	}
 	req.Header("AccessToken", token)
+	if v == nil {
+		return
+	}
 	err = req.ToJSON(v)
 	if err != nil {
 		result = NewErrorResult(err.Error())
-		return
 	}
+	return
+}
+
+// GetConfig 获取配置参数
+func (ah *AuthorizeHandle) GetConfig() (cfg *Config) {
+	cfg = ah.cfg
 	return
 }
 
@@ -64,15 +80,67 @@ func (ah *AuthorizeHandle) VerifyLogin(username, password string) (uid string, r
 
 // AuthorizeAddUserRequest 增加用户信息请求
 type AuthorizeAddUserRequest struct {
-	UID             string
 	MobilePhone     string
 	UserCode        string
 	IDCard          string
 	Password        string
 	DefaultPassword string
+	University      string
 }
 
 // AddUser 增加用户
-func (ah *AuthorizeHandle) AddUser() (result *ErrorResult) {
+func (ah *AuthorizeHandle) AddUser(uid string, user *AuthorizeAddUserRequest) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+		"MobilePhone":     user.MobilePhone,
+		"UserCode":        user.UserCode,
+		"IDCard":          user.IDCard,
+		"Password":        user.Password,
+		"DefaultPassword": user.DefaultPassword,
+		"University":      user.University,
+	}
+	result = ah.request("/api/authorize/adduser", body, nil)
+	return
+}
+
+// AuthorizeEditUserRequest 编辑用户信息请求
+type AuthorizeEditUserRequest struct {
+	MobilePhone string
+	UserCode    string
+	IDCard      string
+}
+
+// EditUser 编辑用户信息
+func (ah *AuthorizeHandle) EditUser(uid string, user *AuthorizeAddUserRequest) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+		"MobilePhone":     user.MobilePhone,
+		"UserCode":        user.UserCode,
+		"IDCard":          user.IDCard,
+	}
+	result = ah.request("/api/authorize/edituser", body, nil)
+	return
+}
+
+// DelUser 删除用户
+func (ah *AuthorizeHandle) DelUser(uid string) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+	result = ah.request("/api/authorize/deluser", body, nil)
+	return
+}
+
+// ModifyPwd 修改密码
+func (ah *AuthorizeHandle) ModifyPwd(uid, password string) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+		"Password":        password,
+	}
+	result = ah.request("/api/authorize/modifypwd", body, nil)
 	return
 }
