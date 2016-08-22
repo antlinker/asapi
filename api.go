@@ -15,8 +15,8 @@ func InitAPI(cfg *Config) {
 	gAuthorize = NewAuthorizeHandle(cfg)
 }
 
-// RegisterUpdateUserCallback 注册更新用户信息回调处理
-func RegisterUpdateUserCallback(w http.ResponseWriter, r *http.Request, callback func(uid string, info map[string]interface{})) (err error) {
+// RegisterUpdateUser 注册更新用户信息处理
+func RegisterUpdateUser(w http.ResponseWriter, r *http.Request, callback func(uid string, info map[string]interface{})) (err error) {
 	identify, uid, ok := r.BasicAuth()
 	if !ok || identify != gAuthorize.GetConfig().ServiceIdentify {
 		err = fmt.Errorf("未识别的用户信息")
