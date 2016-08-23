@@ -24,6 +24,12 @@ func (ah *AuthorizeHandle) request(router string, body, v interface{}) (result *
 		return
 	}
 	req := httplib.Post(ah.cfg.GetURL(router))
+	req, err := req.JSONBody(body)
+	if err != nil {
+		result = NewErrorResult(err.Error())
+		return
+	}
+	req.Header("AccessToken", token)
 	res, err := req.Response()
 	if err != nil {
 		result = NewErrorResult(err.Error())
@@ -38,12 +44,6 @@ func (ah *AuthorizeHandle) request(router string, body, v interface{}) (result *
 		result = &resResult
 		return
 	}
-	req, err = req.JSONBody(body)
-	if err != nil {
-		result = NewErrorResult(err.Error())
-		return
-	}
-	req.Header("AccessToken", token)
 	if v == nil {
 		return
 	}
