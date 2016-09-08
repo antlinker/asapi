@@ -118,6 +118,7 @@ type AuthorizeEditUserRequest struct {
 	MobilePhone string
 	UserCode    string
 	IDCard      string
+	University  string
 }
 
 // EditUser 编辑用户信息
@@ -128,6 +129,7 @@ func (ah *AuthorizeHandle) EditUser(uid string, user *AuthorizeEditUserRequest) 
 		"MobilePhone":     user.MobilePhone,
 		"UserCode":        user.UserCode,
 		"IDCard":          user.IDCard,
+		"University":      user.University,
 	}
 	result = ah.request("/api/authorize/edituser", body, nil)
 	return
