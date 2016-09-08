@@ -9,7 +9,7 @@
 ## 获取
 
 ``` bash
-$ go get -u github.com/antlinker/asapi
+$ go get -u -v github.com/antlinker/asapi
 ```
 
 ## 使用
@@ -22,6 +22,7 @@ import (
 )
 
 func main() {
+	// 初始化认证API
 	asapi.InitAPI(&asapi.Config{
 		ASURL:           "http://127.0.0.1:8099",
 		ClientID:        "57a999b57a03b59ebb9b11b0",
@@ -37,5 +38,17 @@ func main() {
 	if result != nil {
 		// 错误处理
 	}
+
+	// 增加用户
+	// asapi.AddUser
+
+	// 编辑用户信息
+	// asapi.EditUser
+
+	// 删除用户
+	// asapi.DelUser
+
+	// 修改密码
+	// asapi.ModifyPwd
 }
 ```
