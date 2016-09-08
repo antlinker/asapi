@@ -53,7 +53,7 @@ func AddUser(uid string, user *AuthorizeAddUserRequest) (result *ErrorResult) {
 }
 
 // EditUser 编辑用户信息
-func EditUser(uid string, user *AuthorizeAddUserRequest) (result *ErrorResult) {
+func EditUser(uid string, user *AuthorizeEditUserRequest) (result *ErrorResult) {
 	result = gAuthorize.EditUser(uid, user)
 	return
 }

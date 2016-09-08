@@ -112,7 +112,7 @@ type AuthorizeEditUserRequest struct {
 }
 
 // EditUser 编辑用户信息
-func (ah *AuthorizeHandle) EditUser(uid string, user *AuthorizeAddUserRequest) (result *ErrorResult) {
+func (ah *AuthorizeHandle) EditUser(uid string, user *AuthorizeEditUserRequest) (result *ErrorResult) {
 	body := map[string]interface{}{
 		"ServiceIdentify": ah.cfg.ServiceIdentify,
 		"UID":             uid,
