@@ -15,19 +15,26 @@ func InitAPI(cfg *Config) {
 	gAuthorize = NewAuthorizeHandle(cfg)
 }
 
+// UserInfo 更新用户信息
+type UserInfo struct {
+	MobilePhone string
+	UserCode    string
+	IDCard      string
+}
+
 // RegisterUpdateUser 注册更新用户信息处理
-func RegisterUpdateUser(w http.ResponseWriter, r *http.Request, callback func(uid string, info map[string]interface{})) (err error) {
+func RegisterUpdateUser(w http.ResponseWriter, r *http.Request, callback func(uid string, info *UserInfo)) (err error) {
 	identify, uid, ok := r.BasicAuth()
 	if !ok || identify != gAuthorize.GetConfig().ServiceIdentify {
 		err = fmt.Errorf("未识别的用户信息")
 		return
 	}
-	var result map[string]interface{}
+	var result UserInfo
 	err = json.NewDecoder(r.Body).Decode(&result)
 	if err != nil {
 		return
 	}
-	callback(uid, result)
+	callback(uid, &result)
 	w.Write([]byte("ok"))
 	return
 }
