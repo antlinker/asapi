@@ -65,6 +65,7 @@ type LoginUserInfo struct {
 	MobilePhone     string // 手机号码
 	UserCode        string // 用户代码
 	IDCard          string // 身份证号码
+	Password        string // 登录密码
 	DefaultPassword string // 默认登录密码
 	University      string // 学校ID
 }
@@ -80,6 +81,22 @@ func (ah *AuthorizeHandle) VerifyLogin(username, password string) (info *LoginUs
 	}
 	var loginInfo LoginUserInfo
 	result = ah.request("/api/authorize/verifylogin", body, &loginInfo)
+	if result != nil {
+		return
+	}
+	info = &loginInfo
+	return
+}
+
+// GetUser 验证登录
+// uid 用户ID（唯一标识）
+func (ah *AuthorizeHandle) GetUser(uid string) (info *LoginUserInfo, result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+	var loginInfo LoginUserInfo
+	result = ah.request("/api/authorize/getuser", body, &loginInfo)
 	if result != nil {
 		return
 	}

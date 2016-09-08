@@ -48,6 +48,13 @@ func VerifyLogin(username, password string) (info *LoginUserInfo, result *ErrorR
 	return
 }
 
+// GetUser 验证登录
+// uid 用户ID（唯一标识）
+func GetUser(uid string) (info *LoginUserInfo, result *ErrorResult) {
+	info, result = gAuthorize.GetUser(uid)
+	return
+}
+
 // AddUser 增加用户
 func AddUser(uid string, user *AuthorizeAddUserRequest) (result *ErrorResult) {
 	result = gAuthorize.AddUser(uid, user)
