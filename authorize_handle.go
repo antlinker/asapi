@@ -60,21 +60,30 @@ func (ah *AuthorizeHandle) GetConfig() (cfg *Config) {
 	return
 }
 
+// LoginUserInfo 登录用户信息
+type LoginUserInfo struct {
+	MobilePhone     string // 手机号码
+	UserCode        string // 用户代码
+	IDCard          string // 身份证号码
+	DefaultPassword string // 默认登录密码
+	University      string // 学校ID
+}
+
 // VerifyLogin 验证登录
-func (ah *AuthorizeHandle) VerifyLogin(username, password string) (uid string, result *ErrorResult) {
+// username 用户ID（唯一标识）
+// password 密码
+func (ah *AuthorizeHandle) VerifyLogin(username, password string) (info *LoginUserInfo, result *ErrorResult) {
 	body := map[string]interface{}{
 		"ServiceIdentify": ah.cfg.ServiceIdentify,
-		"UserName":        username,
+		"UID":             username,
 		"Password":        password,
 	}
-	var resResult struct {
-		UID string
-	}
-	result = ah.request("/api/authorize/verifylogin", body, &resResult)
+	var loginInfo LoginUserInfo
+	result = ah.request("/api/authorize/verifylogin", body, &loginInfo)
 	if result != nil {
 		return
 	}
-	uid = resResult.UID
+	info = &loginInfo
 	return
 }
 

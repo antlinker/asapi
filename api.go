@@ -40,9 +40,11 @@ func RegisterUpdateUser(w http.ResponseWriter, r *http.Request, callback func(ui
 }
 
 // VerifyLogin 验证登录
-// 登录错误码说明：11 无效的用户名,12 无效的用户,13 无效的密码,14 未授权的服务
-func VerifyLogin(username, password string) (uid string, result *ErrorResult) {
-	uid, result = gAuthorize.VerifyLogin(username, password)
+// username 用户ID（唯一标识）
+// password 密码
+// 登录错误码说明：11 未知的用户,12 无效的用户,13 无效的密码
+func VerifyLogin(username, password string) (info *LoginUserInfo, result *ErrorResult) {
+	info, result = gAuthorize.VerifyLogin(username, password)
 	return
 }
 

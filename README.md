@@ -34,10 +34,9 @@ func main() {
 	// asapi.RegisterUpdateUser()
 
 	// 登录验证
-	uid, result := asapi.VerifyLogin("username", "password")
+	info, result := asapi.VerifyLogin("username", "password")
 	if result != nil {
 		// 错误处理
-		// 登录错误码说明：11 无效的用户名,12 无效的用户,13 无效的密码,14 未授权的服务
 	}
 
 	// 增加用户
