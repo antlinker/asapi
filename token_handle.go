@@ -36,7 +36,7 @@ func (th *TokenHandle) Get() (token string, result *ErrorResult) {
 		th.token.CreateTime.Add(time.Duration(th.token.ExpiresIn+10)*time.Second).Before(time.Now()) {
 		req := httplib.Post(th.cfg.GetURL("/oauth2/token"))
 		req = req.SetBasicAuth(th.cfg.ClientID, th.cfg.ClientSecret)
-		req = req.Param("grant_type", "clientcredentials")
+		req = req.Param("grant_type", "client_credentials")
 		res, err := req.Response()
 		if err != nil {
 			result = NewErrorResult(err.Error())
