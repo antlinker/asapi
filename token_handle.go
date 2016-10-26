@@ -33,7 +33,7 @@ func (th *TokenHandle) Get() (token string, result *ErrorResult) {
 	th.lock.Lock()
 	defer th.lock.Unlock()
 	if th.token == nil ||
-		th.token.CreateTime.Add(time.Duration(th.token.ExpiresIn+10)*time.Second).Before(time.Now()) {
+		th.token.CreateTime.Add(time.Duration(th.token.ExpiresIn-10)*time.Second).Before(time.Now()) {
 		req := httplib.Post(th.cfg.GetURL("/oauth2/token"))
 		req = req.SetBasicAuth(th.cfg.ClientID, th.cfg.ClientSecret)
 		req = req.Param("grant_type", "client_credentials")
