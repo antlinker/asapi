@@ -2,6 +2,7 @@ package asapi
 
 import (
 	"github.com/astaxie/beego/httplib"
+	"net/http"
 )
 
 // NewAuthorizeHandle 创建授权处理
@@ -18,18 +19,19 @@ type AuthorizeHandle struct {
 	th  *TokenHandle
 }
 
-func (ah *AuthorizeHandle) request(router string, body, v interface{}) (result *ErrorResult) {
-	token, result := ah.th.Get()
-	if result != nil {
-		return
+// 请求数据
+func (ah *AuthorizeHandle) request(router, method string, reqHandle func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult), v interface{}) (result *ErrorResult) {
+	req := httplib.NewBeegoRequest(ah.cfg.GetURL(router), method)
+
+	if reqHandle != nil {
+		vreq, vresult := reqHandle(req)
+		if vresult != nil {
+			result = vresult
+			return
+		}
+		req = vreq
 	}
-	req := httplib.Post(ah.cfg.GetURL(router))
-	req, err := req.JSONBody(body)
-	if err != nil {
-		result = NewErrorResult(err.Error())
-		return
-	}
-	req.Header("AccessToken", token)
+
 	res, err := req.Response()
 	if err != nil {
 		result = NewErrorResult(err.Error())
@@ -51,6 +53,30 @@ func (ah *AuthorizeHandle) request(router string, body, v interface{}) (result *
 	if err != nil {
 		result = NewErrorResult(err.Error())
 	}
+
+	return
+}
+
+// 带有访问令牌的post请求
+func (ah *AuthorizeHandle) tokenPost(router string, body, v interface{}) (result *ErrorResult) {
+	reqHandle := func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult) {
+		token, result := ah.th.Get()
+		if result != nil {
+			return req, result
+		}
+		req = req.Header("AccessToken", token)
+
+		if body != nil {
+			vreq, err := req.JSONBody(body)
+			if err != nil {
+				result = NewErrorResult(err.Error())
+				return req, result
+			}
+			req = vreq
+		}
+		return req, nil
+	}
+	result = ah.request(router, http.MethodPost, reqHandle, v)
 	return
 }
 
@@ -80,7 +106,7 @@ func (ah *AuthorizeHandle) VerifyLogin(username, password string) (info *LoginUs
 		"Password":        password,
 	}
 	var loginInfo LoginUserInfo
-	result = ah.request("/api/authorize/verifylogin", body, &loginInfo)
+	result = ah.tokenPost("/api/authorize/verifylogin", body, &loginInfo)
 	if result != nil {
 		return
 	}
@@ -96,7 +122,7 @@ func (ah *AuthorizeHandle) GetUser(uid string) (info *LoginUserInfo, result *Err
 		"UID":             uid,
 	}
 	var loginInfo LoginUserInfo
-	result = ah.request("/api/authorize/getuser", body, &loginInfo)
+	result = ah.tokenPost("/api/authorize/getuser", body, &loginInfo)
 	if result != nil {
 		return
 	}
@@ -126,7 +152,7 @@ func (ah *AuthorizeHandle) AddUser(uid string, user *AuthorizeAddUserRequest) (r
 		"DefaultPassword": user.DefaultPassword,
 		"University":      user.University,
 	}
-	result = ah.request("/api/authorize/adduser", body, nil)
+	result = ah.tokenPost("/api/authorize/adduser", body, nil)
 	return
 }
 
@@ -148,7 +174,7 @@ func (ah *AuthorizeHandle) EditUser(uid string, user *AuthorizeEditUserRequest) 
 		"IDCard":          user.IDCard,
 		"University":      user.University,
 	}
-	result = ah.request("/api/authorize/edituser", body, nil)
+	result = ah.tokenPost("/api/authorize/edituser", body, nil)
 	return
 }
 
@@ -158,7 +184,7 @@ func (ah *AuthorizeHandle) DelUser(uid string) (result *ErrorResult) {
 		"ServiceIdentify": ah.cfg.ServiceIdentify,
 		"UID":             uid,
 	}
-	result = ah.request("/api/authorize/deluser", body, nil)
+	result = ah.tokenPost("/api/authorize/deluser", body, nil)
 	return
 }
 
@@ -169,6 +195,54 @@ func (ah *AuthorizeHandle) ModifyPwd(uid, password string) (result *ErrorResult)
 		"UID":             uid,
 		"Password":        password,
 	}
-	result = ah.request("/api/authorize/modifypwd", body, nil)
+	result = ah.tokenPost("/api/authorize/modifypwd", body, nil)
+	return
+}
+
+// CheckDefaultPwd 检查默认密码
+func (ah *AuthorizeHandle) CheckDefaultPwd(uid string) (isDefault bool, result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+
+	var res struct {
+		IsDefault bool
+	}
+	result = ah.tokenPost("/api/authorize/checkdefaultpwd", body, &res)
+	if result != nil {
+		return
+	}
+	isDefault = res.IsDefault
+	return
+}
+
+// GetToken 获取访问令牌
+func (ah *AuthorizeHandle) GetToken() (token string, result *ErrorResult) {
+	token, result = ah.th.Get()
+	return
+}
+
+// VerifyToken 验证令牌
+func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
+
+	reqHandle := func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult) {
+		req = req.Param("access_token", token)
+		return req, nil
+	}
+
+	var resData struct {
+		UserID   string `json:"user_id"`
+		ClientID string `json:"client_id"`
+	}
+
+	result = ah.request(ah.cfg.GetURL("/oauth2/verify"), http.MethodGet, reqHandle, &resData)
+	if result != nil {
+		return
+	}
+
+	userID = resData.UserID
+	clientID = resData.ClientID
+
 	return
 }

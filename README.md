@@ -50,5 +50,14 @@ func main() {
 
 	// 修改密码
 	// asapi.ModifyPwd
+
+	// 检查默认密码
+	// CheckDefaultPwd
+
+	// 获取令牌
+	// GetToken
+
+	// 验证令牌
+	// VerifyToken
 }
 ```

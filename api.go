@@ -78,3 +78,21 @@ func ModifyPwd(uid, password string) (result *ErrorResult) {
 	result = gAuthorize.ModifyPwd(uid, password)
 	return
 }
+
+// CheckDefaultPwd 检查默认密码
+func CheckDefaultPwd(uid string) (isDefault bool, result *ErrorResult) {
+	isDefault, result = gAuthorize.CheckDefaultPwd(uid)
+	return
+}
+
+// GetToken 获取令牌
+func GetToken() (token string, result *ErrorResult) {
+	token, result = gAuthorize.GetToken()
+	return
+}
+
+// VerifyToken 验证令牌
+func VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
+	userID, clientID, result = gAuthorize.VerifyToken(token)
+	return
+}
