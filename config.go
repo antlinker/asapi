@@ -2,6 +2,7 @@ package asapi
 
 import (
 	"bytes"
+	"errors"
 )
 
 // Config 配置参数
@@ -30,6 +31,11 @@ func (c *Config) GetURL(router string) string {
 type ErrorResult struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+}
+
+// Error 实现error接口
+func (er *ErrorResult) Error() string {
+	return er.Message
 }
 
 // NewErrorResult 创建错误结果
