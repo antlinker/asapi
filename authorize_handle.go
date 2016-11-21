@@ -1,8 +1,10 @@
 package asapi
 
 import (
-	"github.com/astaxie/beego/httplib"
+	"encoding/json"
 	"net/http"
+
+	"github.com/astaxie/beego/httplib"
 )
 
 // NewAuthorizeHandle 创建授权处理
@@ -36,22 +38,25 @@ func (ah *AuthorizeHandle) request(router, method string, reqHandle func(req *ht
 	if err != nil {
 		result = NewErrorResult(err.Error())
 		return
-	} else if res.StatusCode != 200 {
-		var resResult ErrorResult
-		err = req.ToJSON(&resResult)
-		if err != nil {
-			result = NewErrorResult(err.Error())
-			return
-		}
-		result = &resResult
-		return
 	}
-	if v == nil {
-		return
-	}
-	err = req.ToJSON(v)
+
+	buf, err := req.Bytes()
 	if err != nil {
 		result = NewErrorResult(err.Error())
+		return
+	}
+
+	switch res.StatusCode {
+	case 200:
+		if v == nil {
+			return
+		}
+		err = json.Unmarshal(buf, v)
+		if err != nil {
+			result = NewErrorResult(err.Error())
+		}
+	default:
+		result = NewErrorResult(string(buf), res.StatusCode)
 	}
 
 	return
@@ -236,7 +241,7 @@ func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, r
 		ClientID string `json:"client_id"`
 	}
 
-	result = ah.request(ah.cfg.GetURL("/oauth2/verify"), http.MethodGet, reqHandle, &resData)
+	result = ah.request("/oauth2/verify", http.MethodGet, reqHandle, &resData)
 	if result != nil {
 		return
 	}
