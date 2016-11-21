@@ -1,9 +1,6 @@
 package asapi
 
-import (
-	"bytes"
-	"errors"
-)
+import "bytes"
 
 // Config 配置参数
 type Config struct {
