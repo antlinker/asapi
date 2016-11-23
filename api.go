@@ -96,3 +96,9 @@ func VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
 	userID, clientID, result = gAuthorize.VerifyToken(token)
 	return
 }
+
+// MergeUser 合并认证用户
+func MergeUser(req *AuthorizeMergeUserRequest) (result *ErrorResult) {
+	result = gAuthorize.MergeUser(req)
+	return
+}
