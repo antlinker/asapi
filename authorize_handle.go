@@ -251,3 +251,28 @@ func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, r
 
 	return
 }
+
+// AuthorizeMergeUserRequest 合并用户请求参数
+type AuthorizeMergeUserRequest struct {
+	UID         string
+	TUID        string
+	TUserCode   string
+	TUniversity string
+}
+
+// MergeUser 合并用户
+func (ah *AuthorizeHandle) MergeUser(req *AuthorizeMergeUserRequest) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             req.UID,
+		"TUID":            req.TUID,
+		"TUserCode":       req.TUserCode,
+		"TUniversity":     req.TUniversity,
+	}
+
+	result = ah.tokenPost("/api/authorize/mergeuser", body, nil)
+	if result != nil {
+		return
+	}
+	return
+}
