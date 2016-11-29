@@ -97,6 +97,12 @@ func VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
 	return
 }
 
+// GetUpgradeToken 获取升级令牌
+func GetUpgradeToken(password, uid, clientID, clientSecret string) (info map[string]interface{}, result *ErrorResult) {
+	info, result = gAuthorize.GetUpgradeToken(password, uid, clientID, clientSecret)
+	return
+}
+
 // MergeUser 合并认证用户
 func MergeUser(req *AuthorizeMergeUserRequest) (result *ErrorResult) {
 	result = gAuthorize.MergeUser(req)

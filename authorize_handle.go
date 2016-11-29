@@ -1,6 +1,7 @@
 package asapi
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 
@@ -248,6 +249,33 @@ func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, r
 
 	userID = resData.UserID
 	clientID = resData.ClientID
+
+	return
+}
+
+// GetUpgradeToken 获取升级令牌
+func (ah *AuthorizeHandle) GetUpgradeToken(password, uid, clientID, clientSecret string) (info map[string]interface{}, result *ErrorResult) {
+
+	reqHandle := func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult) {
+		req = req.SetBasicAuth(clientID, clientSecret)
+
+		req = req.Param("grant_type", "password")
+		userInfo := map[string]interface{}{
+			"LoginModel":   9,
+			"UserName":     uid,
+			"ClientID":     ah.GetConfig().ClientID,
+			"ClientSecret": ah.GetConfig().ClientSecret,
+		}
+
+		buf, _ := json.Marshal(userInfo)
+		userName := base64.RawStdEncoding.EncodeToString(buf)
+		req = req.Param("username", userName)
+		req = req.Param("password", password)
+
+		return req, nil
+	}
+
+	result = ah.request("/oauth2/token", http.MethodPost, reqHandle, &info)
 
 	return
 }
