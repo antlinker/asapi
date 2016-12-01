@@ -59,5 +59,8 @@ func main() {
 
 	// 验证令牌
 	// VerifyToken
+
+	// 获取升级令牌
+	// GetUpgradeToken
 }
 ```

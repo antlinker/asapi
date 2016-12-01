@@ -8,6 +8,8 @@ type Config struct {
 	ClientID        string // 客户端ID
 	ClientSecret    string // 客户端秘钥
 	ServiceIdentify string // 服务标识
+	IsEnabledCache  bool   // 是否启用缓存
+	CacheGCInterval int    // 缓存gc间隔(单位秒)
 }
 
 // GetURL 获取请求的URL

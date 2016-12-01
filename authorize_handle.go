@@ -4,22 +4,34 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/antlinker/go-cache"
 	"github.com/astaxie/beego/httplib"
 )
 
 // NewAuthorizeHandle 创建授权处理
 func NewAuthorizeHandle(cfg *Config) *AuthorizeHandle {
-	return &AuthorizeHandle{
+	ah := &AuthorizeHandle{
 		cfg: cfg,
 		th:  NewTokenHandle(cfg),
 	}
+
+	if ah.cfg.IsEnabledCache {
+		if ah.cfg.CacheGCInterval == 0 {
+			ah.cfg.CacheGCInterval = 300
+		}
+		ah.cache = cache.New(0, time.Second*time.Duration(ah.cfg.CacheGCInterval))
+	}
+
+	return ah
 }
 
 // AuthorizeHandle 授权处理
 type AuthorizeHandle struct {
-	cfg *Config
-	th  *TokenHandle
+	cfg   *Config
+	th    *TokenHandle
+	cache *cache.Cache
 }
 
 // 请求数据
@@ -231,6 +243,18 @@ func (ah *AuthorizeHandle) GetToken() (token string, result *ErrorResult) {
 
 // VerifyToken 验证令牌
 func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
+	const tokenCacheKey = "access_key"
+
+	if ah.cfg.IsEnabledCache {
+		// 检查缓存数据
+		if at, ok := ah.cache.Get(tokenCacheKey); ok {
+			if atm, ok := at.(map[string]string); ok {
+				userID = atm["UserID"]
+				clientID = atm["ClientiD"]
+				return
+			}
+		}
+	}
 
 	reqHandle := func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult) {
 		req = req.Param("access_token", token)
@@ -238,8 +262,9 @@ func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, r
 	}
 
 	var resData struct {
-		UserID   string `json:"user_id"`
-		ClientID string `json:"client_id"`
+		UserID    string `json:"user_id"`
+		ClientID  string `json:"client_id"`
+		ExpiresIn int    `json:"expires_in"`
 	}
 
 	result = ah.request("/oauth2/verify", http.MethodGet, reqHandle, &resData)
@@ -249,6 +274,14 @@ func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, r
 
 	userID = resData.UserID
 	clientID = resData.ClientID
+
+	if ah.cfg.IsEnabledCache && ah.cfg.CacheGCInterval < resData.ExpiresIn {
+		data := map[string]string{
+			"UserID":   resData.UserID,
+			"ClientID": resData.ClientID,
+		}
+		ah.cache.Set(tokenCacheKey, data, time.Duration(resData.ExpiresIn-ah.cfg.CacheGCInterval)*time.Second)
+	}
 
 	return
 }
