@@ -243,13 +243,17 @@ func (ah *AuthorizeHandle) GetToken() (token string, result *ErrorResult) {
 
 // VerifyToken 验证令牌
 func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
+	const (
+		userIDKey   = "UserID"
+		clientIDKey = "ClientID"
+	)
 
 	if ah.cfg.IsEnabledCache {
 		// 检查缓存数据
 		if at, ok := ah.cache.Get(token); ok {
 			if atm, ok := at.(map[string]string); ok {
-				userID = atm["UserID"]
-				clientID = atm["ClientiD"]
+				userID = atm[userIDKey]
+				clientID = atm[clientIDKey]
 				return
 			}
 		}
@@ -276,8 +280,8 @@ func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, r
 
 	if ah.cfg.IsEnabledCache && ah.cfg.CacheGCInterval < resData.ExpiresIn {
 		data := map[string]string{
-			"UserID":   resData.UserID,
-			"ClientID": resData.ClientID,
+			userIDKey:   resData.UserID,
+			clientIDKey: resData.ClientID,
 		}
 		ah.cache.Set(token, data, time.Duration(resData.ExpiresIn-ah.cfg.CacheGCInterval)*time.Second)
 	}
