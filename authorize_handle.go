@@ -261,6 +261,7 @@ func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, r
 
 	reqHandle := func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult) {
 		req = req.Param("access_token", token)
+		req = req.Param("service", ah.GetConfig().ServiceIdentify)
 		return req, nil
 	}
 
