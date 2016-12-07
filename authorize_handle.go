@@ -336,8 +336,28 @@ func (ah *AuthorizeHandle) MergeUser(req *AuthorizeMergeUserRequest) (result *Er
 	}
 
 	result = ah.tokenPost("/api/authorize/mergeuser", body, nil)
+	return
+}
+
+// GetStaffParam 获取学工请求参数
+func (ah *AuthorizeHandle) GetStaffParam(identify, uid string) (buID, addr string, result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+
+	var resData struct {
+		BuID string
+		Addr string
+	}
+
+	result = ah.tokenPost("/api/authorize/getstaffparam", body, &resData)
 	if result != nil {
 		return
 	}
+
+	buID = resData.BuID
+	addr = resData.Addr
+
 	return
 }

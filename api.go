@@ -108,3 +108,9 @@ func MergeUser(req *AuthorizeMergeUserRequest) (result *ErrorResult) {
 	result = gAuthorize.MergeUser(req)
 	return
 }
+
+// GetStaffParam 获取学工请求参数
+func GetStaffParam(identify, uid string) (buID, addr string, result *ErrorResult) {
+	buID, addr, result = gAuthorize.GetStaffParam(identify, uid)
+	return
+}
