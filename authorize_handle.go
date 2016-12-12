@@ -342,7 +342,7 @@ func (ah *AuthorizeHandle) MergeUser(req *AuthorizeMergeUserRequest) (result *Er
 // GetStaffParam 获取学工请求参数
 func (ah *AuthorizeHandle) GetStaffParam(identify, uid string) (buID, addr string, result *ErrorResult) {
 	body := map[string]interface{}{
-		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"ServiceIdentify": identify,
 		"UID":             uid,
 	}
 
