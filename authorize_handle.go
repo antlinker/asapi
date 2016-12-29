@@ -156,12 +156,19 @@ type AuthorizeAddUserRequest struct {
 	Password        string
 	DefaultPassword string
 	University      string
+	ServiceIdentify string
 }
 
 // AddUser 增加用户
 func (ah *AuthorizeHandle) AddUser(uid string, user *AuthorizeAddUserRequest) (result *ErrorResult) {
+	identify := ah.cfg.ServiceIdentify
+
+	if v := user.ServiceIdentify; v != "" {
+		identify = v
+	}
+
 	body := map[string]interface{}{
-		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"ServiceIdentify": identify,
 		"UID":             uid,
 		"MobilePhone":     user.MobilePhone,
 		"UserCode":        user.UserCode,
