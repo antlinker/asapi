@@ -312,7 +312,7 @@ func (ah *AuthorizeHandle) GetUpgradeToken(password, uid, clientID, clientSecret
 		}
 
 		buf, _ := json.Marshal(userInfo)
-		userName := base64.RawStdEncoding.EncodeToString(buf)
+		userName := base64.StdEncoding.EncodeToString(buf)
 		req = req.Param("username", userName)
 		req = req.Param("password", password)
 
@@ -320,6 +320,51 @@ func (ah *AuthorizeHandle) GetUpgradeToken(password, uid, clientID, clientSecret
 	}
 
 	result = ah.request("/oauth2/token", http.MethodPost, reqHandle, &info)
+
+	return
+}
+
+// UserTokenInfo 用户令牌信息
+type UserTokenInfo struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"token_type"`
+	Expires      int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	Scope        string `json:"scope"`
+	UserID       string `json:"user_id"`
+}
+
+// UserLoginToken 用户登录令牌
+func (ah *AuthorizeHandle) UserLoginToken(userName, password, service string) (tokenInfo *UserTokenInfo, result *ErrorResult) {
+
+	reqHandle := func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult) {
+		req = req.SetBasicAuth(ah.GetConfig().ClientID, ah.GetConfig().ClientSecret)
+		req = req.Param("grant_type", "password")
+
+		var userInfo = struct {
+			LoginModel int
+			UserName   string
+			Service    string
+		}{
+			LoginModel: 1,
+			UserName:   userName,
+			Service:    service,
+		}
+		buf, _ := json.Marshal(userInfo)
+
+		userName := base64.StdEncoding.EncodeToString(buf)
+		req = req.Param("username", userName)
+		req = req.Param("password", password)
+
+		return req, nil
+	}
+
+	var info UserTokenInfo
+	result = ah.request("/oauth2/token", http.MethodPost, reqHandle, &info)
+	if result != nil {
+		return
+	}
+	tokenInfo = &info
 
 	return
 }

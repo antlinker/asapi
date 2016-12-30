@@ -114,3 +114,9 @@ func GetStaffParam(identify, uid string) (buID, addr string, result *ErrorResult
 	buID, addr, result = gAuthorize.GetStaffParam(identify, uid)
 	return
 }
+
+// UserLoginToken 用户登录令牌
+func UserLoginToken(userName, password, service string) (tokenInfo *UserTokenInfo, result *ErrorResult) {
+	tokenInfo, result = gAuthorize.UserLoginToken(userName, password, service)
+	return
+}
