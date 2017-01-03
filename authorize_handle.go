@@ -328,7 +328,7 @@ func (ah *AuthorizeHandle) GetUpgradeToken(password, uid, clientID, clientSecret
 type UserTokenInfo struct {
 	AccessToken  string `json:"access_token"`
 	TokenType    string `json:"token_type"`
-	Expires      int    `json:"expires_in"`
+	Expires      int64  `json:"expires_in"`
 	RefreshToken string `json:"refresh_token"`
 	Scope        string `json:"scope"`
 	UserID       string `json:"user_id"`
@@ -355,6 +355,27 @@ func (ah *AuthorizeHandle) UserLoginToken(userName, password, service string) (t
 		userName := base64.StdEncoding.EncodeToString(buf)
 		req = req.Param("username", userName)
 		req = req.Param("password", password)
+
+		return req, nil
+	}
+
+	var info UserTokenInfo
+	result = ah.request("/oauth2/token", http.MethodPost, reqHandle, &info)
+	if result != nil {
+		return
+	}
+	tokenInfo = &info
+
+	return
+}
+
+// UserRefreshToken 用户更新令牌
+func (ah *AuthorizeHandle) UserRefreshToken(rtoken string) (tokenInfo *UserTokenInfo, result *ErrorResult) {
+
+	reqHandle := func(req *httplib.BeegoHTTPRequest) (*httplib.BeegoHTTPRequest, *ErrorResult) {
+		req = req.SetBasicAuth(ah.GetConfig().ClientID, ah.GetConfig().ClientSecret)
+		req = req.Param("grant_type", "refresh_token")
+		req = req.Param("refresh_token", rtoken)
 
 		return req, nil
 	}

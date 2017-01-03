@@ -120,3 +120,9 @@ func UserLoginToken(userName, password, service string) (tokenInfo *UserTokenInf
 	tokenInfo, result = gAuthorize.UserLoginToken(userName, password, service)
 	return
 }
+
+// UserRefreshToken 用户更新令牌
+func UserRefreshToken(rtoken string) (tokenInfo *UserTokenInfo, result *ErrorResult) {
+	tokenInfo, result = gAuthorize.UserRefreshToken(rtoken)
+	return
+}
