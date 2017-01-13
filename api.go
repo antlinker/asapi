@@ -126,3 +126,9 @@ func UserRefreshToken(rtoken string) (tokenInfo *UserTokenInfo, result *ErrorRes
 	tokenInfo, result = gAuthorize.UserRefreshToken(rtoken)
 	return
 }
+
+// MergeTELUser 合并手机号用户
+func MergeTELUser(req *AuthorizeMergeTELUserRequest) (result *ErrorResult) {
+	result = gAuthorize.MergeTELUser(req)
+	return
+}

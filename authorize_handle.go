@@ -434,3 +434,21 @@ func (ah *AuthorizeHandle) GetStaffParam(identify, uid string) (buID, addr strin
 
 	return
 }
+
+// AuthorizeMergeTELUserRequest 合并手机号用户请求参数
+type AuthorizeMergeTELUserRequest struct {
+	MUID string
+	CUID string
+}
+
+// MergeTELUser 合并手机号用户
+func (ah *AuthorizeHandle) MergeTELUser(req *AuthorizeMergeTELUserRequest) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"MUID":            req.MUID,
+		"CUID":            req.CUID,
+	}
+
+	result = ah.tokenPost("/api/authorize/mergeteluser", body, nil)
+	return
+}
