@@ -248,6 +248,16 @@ func (ah *AuthorizeHandle) GetToken() (token string, result *ErrorResult) {
 	return
 }
 
+// ForceGetToken 强制获取访问令牌
+func (ah *AuthorizeHandle) ForceGetToken() (tokenString string, result *ErrorResult) {
+	token, result := ah.th.ForceGet()
+	if result != nil {
+		return
+	}
+	tokenString = token.AccessToken
+	return
+}
+
 // VerifyToken 验证令牌
 func (ah *AuthorizeHandle) VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
 	const (

@@ -91,6 +91,12 @@ func GetToken() (token string, result *ErrorResult) {
 	return
 }
 
+// ForceGetToken 强制获取访问令牌
+func ForceGetToken() (tokenString string, result *ErrorResult) {
+	tokenString, result = gAuthorize.ForceGetToken()
+	return
+}
+
 // VerifyToken 验证令牌
 func VerifyToken(token string) (userID, clientID string, result *ErrorResult) {
 	userID, clientID, result = gAuthorize.VerifyToken(token)
