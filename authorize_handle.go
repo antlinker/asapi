@@ -462,3 +462,21 @@ func (ah *AuthorizeHandle) MergeTELUser(req *AuthorizeMergeTELUserRequest) (resu
 	result = ah.tokenPost("/api/authorize/mergeteluser", body, nil)
 	return
 }
+
+// ClearAuthRequest 清理用户认证信息请求参数
+type ClearAuthRequest struct {
+	UID        string
+	University string
+}
+
+// ClearAuth 清理用户认证信息
+func (ah *AuthorizeHandle) ClearAuth(req *ClearAuthRequest) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             req.UID,
+		"University":      req.University,
+	}
+
+	result = ah.tokenPost("/api/authorize/clearauth", body, nil)
+	return
+}

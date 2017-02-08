@@ -138,3 +138,9 @@ func MergeTELUser(req *AuthorizeMergeTELUserRequest) (result *ErrorResult) {
 	result = gAuthorize.MergeTELUser(req)
 	return
 }
+
+// ClearAuth 清理用户认证信息
+func ClearAuth(req *ClearAuthRequest) (result *ErrorResult) {
+	result = gAuthorize.ClearAuth(req)
+	return
+}
