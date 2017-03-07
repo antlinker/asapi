@@ -183,16 +183,22 @@ func (ah *AuthorizeHandle) AddUser(uid string, user *AuthorizeAddUserRequest) (r
 
 // AuthorizeEditUserRequest 编辑用户信息请求
 type AuthorizeEditUserRequest struct {
-	MobilePhone string
-	UserCode    string
-	IDCard      string
-	University  string
+	MobilePhone     string
+	UserCode        string
+	IDCard          string
+	University      string
+	ServiceIdentify string
 }
 
 // EditUser 编辑用户信息
 func (ah *AuthorizeHandle) EditUser(uid string, user *AuthorizeEditUserRequest) (result *ErrorResult) {
+	identify := ah.cfg.ServiceIdentify
+
+	if v := user.ServiceIdentify; v != "" {
+		identify = v
+	}
 	body := map[string]interface{}{
-		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"ServiceIdentify": identify,
 		"UID":             uid,
 		"MobilePhone":     user.MobilePhone,
 		"UserCode":        user.UserCode,
@@ -214,9 +220,13 @@ func (ah *AuthorizeHandle) DelUser(uid string) (result *ErrorResult) {
 }
 
 // ModifyPwd 修改密码
-func (ah *AuthorizeHandle) ModifyPwd(uid, password string) (result *ErrorResult) {
+func (ah *AuthorizeHandle) ModifyPwd(uid, password string, services ...string) (result *ErrorResult) {
+	identify := ah.cfg.ServiceIdentify
+	if len(services) > 0 {
+		identify = services[0]
+	}
 	body := map[string]interface{}{
-		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"ServiceIdentify": identify,
 		"UID":             uid,
 		"Password":        password,
 	}
@@ -478,5 +488,23 @@ func (ah *AuthorizeHandle) ClearAuth(req *ClearAuthRequest) (result *ErrorResult
 	}
 
 	result = ah.tokenPost("/api/authorize/clearauth", body, nil)
+	return
+}
+
+// GetUserCode 根据用户ID获取UserCode
+func (ah *AuthorizeHandle) GetUserCode(uid string) (userCode string, result *ErrorResult) {
+	body := map[string]interface{}{
+		"UID": uid,
+	}
+
+	var res struct {
+		UserCode string
+	}
+
+	result = ah.tokenPost("/api/authorize/usercode", body, &res)
+	if result != nil {
+		return
+	}
+	userCode = res.UserCode
 	return
 }

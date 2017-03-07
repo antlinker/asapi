@@ -74,8 +74,8 @@ func DelUser(uid string) (result *ErrorResult) {
 }
 
 // ModifyPwd 修改密码
-func ModifyPwd(uid, password string) (result *ErrorResult) {
-	result = gAuthorize.ModifyPwd(uid, password)
+func ModifyPwd(uid, password string, services ...string) (result *ErrorResult) {
+	result = gAuthorize.ModifyPwd(uid, password, services...)
 	return
 }
 
@@ -142,5 +142,11 @@ func MergeTELUser(req *AuthorizeMergeTELUserRequest) (result *ErrorResult) {
 // ClearAuth 清理用户认证信息
 func ClearAuth(req *ClearAuthRequest) (result *ErrorResult) {
 	result = gAuthorize.ClearAuth(req)
+	return
+}
+
+// GetUserCode 根据用户ID获取UserCode
+func GetUserCode(uid string) (userCode string, result *ErrorResult) {
+	userCode, result = gAuthorize.GetUserCode(uid)
 	return
 }
