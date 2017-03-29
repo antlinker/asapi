@@ -150,3 +150,33 @@ func GetUserCode(uid string) (userCode string, result *ErrorResult) {
 	userCode, result = gAuthorize.GetUserCode(uid)
 	return
 }
+
+// AddStaffUser 增加学工用户
+func AddStaffUser(req *AddStaffUserRequest) (result *ErrorResult) {
+	result = gAuthorize.AddStaffUser(req)
+	return
+}
+
+// UpdateUserBasic 更新用户基础信息
+func UpdateUserBasic(req *UpdateUserBasicRequest) (result *ErrorResult) {
+	result = gAuthorize.UpdateUserBasic(req)
+	return
+}
+
+// GetUserVersion 获取用户版本信息
+func GetUserVersion(uid string) (resResult *GetUserVersionResult, result *ErrorResult) {
+	resResult, result = gAuthorize.GetUserVersion(uid)
+	return
+}
+
+// UserActivate 用户激活
+func UserActivate(uid string) (resResult *UserActivateResult, result *ErrorResult) {
+	resResult, result = gAuthorize.UserActivate(uid)
+	return
+}
+
+// GetUserUpdate 获取获取用户更新信息
+func GetUserUpdate(uid string) (resResult *GetUserUpdateResult, result *ErrorResult) {
+	resResult, result = gAuthorize.GetUserUpdate(uid)
+	return
+}

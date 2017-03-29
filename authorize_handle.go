@@ -508,3 +508,130 @@ func (ah *AuthorizeHandle) GetUserCode(uid string) (userCode string, result *Err
 	userCode = res.UserCode
 	return
 }
+
+// AddStaffUserRequest 增加学工用户请求参数
+type AddStaffUserRequest struct {
+	UID         string // 用户标识
+	MobilePhone string // 手机号
+	UserCode    string // 学号
+	IDCard      string // 身份证号
+	Password    string // 密码
+	University  string // 学校ID
+	Name        string // 真实姓名
+	Sex         string // 性别（F女,M男）
+	DeptID      string // 部门或学院ID
+}
+
+// AddStaffUser 增加学工用户
+func (ah *AuthorizeHandle) AddStaffUser(req *AddStaffUserRequest) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             req.UID,
+		"MobilePhone":     req.MobilePhone,
+		"UserCode":        req.UserCode,
+		"IDCard":          req.IDCard,
+		"Password":        req.Password,
+		"University":      req.University,
+		"Name":            req.Name,
+		"Sex":             req.Sex,
+		"DeptID":          req.DeptID,
+	}
+
+	result = ah.tokenPost("/api/authorize/addstaffuser", body, nil)
+	return
+}
+
+// UpdateUserBasicRequest 更新用户基础信息请求参数
+type UpdateUserBasicRequest struct {
+	UID    string // 用户标识
+	Name   string // 真实姓名
+	DeptID string // 部门或学院ID
+}
+
+// UpdateUserBasic 更新用户基础信息
+func (ah *AuthorizeHandle) UpdateUserBasic(req *UpdateUserBasicRequest) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             req.UID,
+		"Name":            req.Name,
+		"DeptID":          req.DeptID,
+	}
+
+	result = ah.tokenPost("/api/authorize/updateuserbasic", body, nil)
+	return
+}
+
+// GetUserVersionResult 用户版本信息
+type GetUserVersionResult struct {
+	Version  int // 版本号
+	Activate int // 激活状态（0已激活，1未激活）
+}
+
+// GetUserVersion 获取用户版本信息
+func (ah *AuthorizeHandle) GetUserVersion(uid string) (resResult *GetUserVersionResult, result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+
+	var res GetUserVersionResult
+
+	result = ah.tokenPost("/api/authorize/getuserversion", body, &res)
+	if result != nil {
+		return
+	}
+	resResult = &res
+	return
+}
+
+// UserActivateResult 用户激活
+type UserActivateResult struct {
+	MobilePhone string // 手机号码
+	UserCode    string // 用户代码
+	IDCard      string // 身份证号码
+	University  string // 学校ID
+	RealName    string // 真实姓名
+	Sex         string // 性别（F女,M男）
+	DeptID      string // 部门ID(学工是学院或部门，学生是班级)
+	UserType    string // 用户类型（1学生 2老师）
+}
+
+// UserActivate 用户激活
+func (ah *AuthorizeHandle) UserActivate(uid string) (resResult *UserActivateResult, result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+
+	var res UserActivateResult
+
+	result = ah.tokenPost("/api/authorize/useractivate", body, &res)
+	if result != nil {
+		return
+	}
+	resResult = &res
+	return
+}
+
+// GetUserUpdateResult 获取用户更新信息
+type GetUserUpdateResult struct {
+	RealName string // 真实姓名
+	DeptID   string // 部门ID(学工是学院或部门，学生是班级)
+}
+
+// GetUserUpdate 获取获取用户更新信息
+func (ah *AuthorizeHandle) GetUserUpdate(uid string) (resResult *GetUserUpdateResult, result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+
+	var res GetUserUpdateResult
+
+	result = ah.tokenPost("/api/authorize/getuserupdate", body, &res)
+	if result != nil {
+		return
+	}
+	resResult = &res
+	return
+}
