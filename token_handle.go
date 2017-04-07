@@ -4,6 +4,8 @@ import (
 	"sync"
 	"time"
 
+	"io/ioutil"
+
 	"github.com/astaxie/beego/httplib"
 )
 
@@ -38,15 +40,12 @@ func (th *TokenHandle) ForceGet() (token *Token, result *ErrorResult) {
 		result = NewErrorResult(err.Error())
 		return
 	} else if res.StatusCode != 200 {
-		var resResult struct {
-			Error string `json:"error"`
-		}
-		err = req.ToJSON(&resResult)
+		buf, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			result = NewErrorResult(err.Error())
 			return
 		}
-		result = NewErrorResult(resResult.Error)
+		result = NewErrorResult(string(buf), res.StatusCode)
 		return
 	}
 	var t Token
