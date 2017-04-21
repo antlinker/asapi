@@ -1,6 +1,9 @@
 package asapi
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+)
 
 // Config 配置参数
 type Config struct {
@@ -34,7 +37,7 @@ type ErrorResult struct {
 
 // Error 实现error接口
 func (er *ErrorResult) Error() string {
-	return er.Message
+	return fmt.Sprintf("[ASAPI Error] %d - %s", er.Code, er.Message)
 }
 
 // NewErrorResult 创建错误结果

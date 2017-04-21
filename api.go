@@ -180,3 +180,15 @@ func GetUserUpdate(uid string) (resResult *GetUserUpdateResult, result *ErrorRes
 	resResult, result = gAuthorize.GetUserUpdate(uid)
 	return
 }
+
+// DelStaffUser 删除学工用户
+func DelStaffUser(uid string) (result *ErrorResult) {
+	result = gAuthorize.DelStaffUser(uid)
+	return
+}
+
+// UpdateAuthStatus 更新用户认证状态
+func UpdateAuthStatus(uid string) (result *ErrorResult) {
+	result = gAuthorize.UpdateAuthStatus(uid)
+	return
+}

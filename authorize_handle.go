@@ -635,3 +635,25 @@ func (ah *AuthorizeHandle) GetUserUpdate(uid string) (resResult *GetUserUpdateRe
 	resResult = &res
 	return
 }
+
+// DelStaffUser 删除学工用户
+func (ah *AuthorizeHandle) DelStaffUser(uid string) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+
+	result = ah.tokenPost("/api/authorize/delstaffuser", body, nil)
+	return
+}
+
+// UpdateAuthStatus 更新用户认证状态
+func (ah *AuthorizeHandle) UpdateAuthStatus(uid string) (result *ErrorResult) {
+	body := map[string]interface{}{
+		"ServiceIdentify": ah.cfg.ServiceIdentify,
+		"UID":             uid,
+	}
+
+	result = ah.tokenPost("/api/authorize/updateauthstatus", body, nil)
+	return
+}
