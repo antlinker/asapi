@@ -563,8 +563,9 @@ func (ah *AuthorizeHandle) UpdateUserBasic(req *UpdateUserBasicRequest) (result 
 
 // GetUserVersionResult 用户版本信息
 type GetUserVersionResult struct {
-	Version  int // 版本号
-	Activate int // 激活状态（0已激活，1未激活）
+	ClearAuth int // 清理用户认证信息(0不清理 1清理)
+	Version   int // 版本号
+	Activate  int // 激活状态（0已激活，1未激活）
 }
 
 // GetUserVersion 获取用户版本信息
